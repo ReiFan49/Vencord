@@ -35,7 +35,6 @@ import { SettingsTab, wrapTab } from "./shared";
 
 const cl = classNameFactory("vc-settings-");
 
-const DEFAULT_DONATE_IMAGE = "https://cdn.discordapp.com/emojis/1026533090627174460.png";
 const SHIGGY_DONATE_IMAGE = "https://media.discordapp.net/stickers/1039992459209490513.png";
 
 type KeysOfType<Object, Type> = {
@@ -49,7 +48,7 @@ function VencordSettings() {
     });
     const settings = useSettings();
 
-    const donateImage = React.useMemo(() => Math.random() > 0.5 ? DEFAULT_DONATE_IMAGE : SHIGGY_DONATE_IMAGE, []);
+    const donateImage = SHIGGY_DONATE_IMAGE;
 
     const isWindows = navigator.platform.toLowerCase().startsWith("win");
     const isMac = navigator.platform.toLowerCase().startsWith("mac");
@@ -258,8 +257,7 @@ function DonateCard({ image }: DonateCardProps) {
                 height={128}
                 style={{
                     imageRendering: image === SHIGGY_DONATE_IMAGE ? "pixelated" : void 0,
-                    marginLeft: "auto",
-                    transform: image === DEFAULT_DONATE_IMAGE ? "rotate(10deg)" : void 0
+                    marginLeft: "auto"
                 }}
             />
         </Card>
