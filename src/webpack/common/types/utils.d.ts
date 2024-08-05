@@ -25,13 +25,17 @@ import { i18nMessages } from "./i18nMessages";
 
 export { FluxEvents };
 
+export type FluxCallbackPredicate = (data: any) => boolean;
+export type FluxCallbackAction = (data: any) => void;
+
 export interface FluxDispatcher {
     _actionHandlers: any;
+    _interceptors: FluxCallbackPredicate[];
     _subscriptions: any;
     dispatch(event: { [key: string]: unknown; type: FluxEvents; }): Promise<void>;
     isDispatching(): boolean;
-    subscribe(event: FluxEvents, callback: (data: any) => void): void;
-    unsubscribe(event: FluxEvents, callback: (data: any) => void): void;
+    subscribe(event: FluxEvents, callback: FluxCallbackAction): void;
+    unsubscribe(event: FluxEvents, callback: FluxCallbackAction): void;
     wait(callback: () => void): void;
 }
 
