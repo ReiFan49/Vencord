@@ -53,6 +53,12 @@ export interface Patch {
     predicate?(): boolean;
 }
 
+export interface FluxPluginInterceptor {
+    callback: UtilTypes.FluxCallbackPredicate;
+    wrapped: UtilTypes.FluxCallbackPredicate;
+    types: FluxEvents[];
+}
+
 export interface PluginAuthor {
     name: string;
     id: BigInt;
@@ -124,6 +130,10 @@ export interface PluginDef {
     settingsAboutComponent?: React.ComponentType<{
         tempSettings?: Record<string, any>;
     }>;
+    /**
+     * Allows you to intercept Flux events
+     */
+    fluxInterceptors?: FluxPluginInterceptor[];
     /**
      * Allows you to subscribe to Flux events
      */
