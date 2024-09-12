@@ -18,6 +18,7 @@
 
 import { registerCommand, unregisterCommand } from "@api/Commands";
 import { addContextMenuPatch, removeContextMenuPatch } from "@api/ContextMenu";
+import { subscribePluginFluxInterceptors, unsubscribePluginFluxInterceptors } from "@api/fluxInterceptors";
 import { Settings } from "@api/Settings";
 import { Logger } from "@utils/Logger";
 import { canonicalizeFind } from "@utils/patches";
@@ -206,6 +207,7 @@ export function subscribeAllPluginsFluxEvents(fluxDispatcher: typeof FluxDispatc
     for (const name in Plugins) {
         if (!isPluginEnabled(name)) continue;
         subscribePluginFluxEvents(Plugins[name], fluxDispatcher);
+        subscribePluginFluxInterceptors(Plugins[name], fluxDispatcher);
     }
 }
 
@@ -244,6 +246,7 @@ export const startPlugin = traceFunction("startPlugin", function startPlugin(p: 
         subscribePluginFluxEvents(p, FluxDispatcher);
     }
 
+    subscribePluginFluxInterceptors(p, FluxDispatcher);
 
     if (contextMenus) {
         logger.debug("Adding context menus patches of plugin", name);
@@ -287,6 +290,7 @@ export const stopPlugin = traceFunction("stopPlugin", function stopPlugin(p: Plu
     }
 
     unsubscribePluginFluxEvents(p, FluxDispatcher);
+    unsubscribePluginFluxInterceptors(p, FluxDispatcher);
 
     if (contextMenus) {
         logger.debug("Removing context menus patches of plugin", name);

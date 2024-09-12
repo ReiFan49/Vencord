@@ -18,12 +18,40 @@
 
 import { Command } from "@api/Commands";
 import { NavContextMenuPatchCallback } from "@api/ContextMenu";
+import { Logger } from "@utils/Logger";
+import { UtilTypes } from "@webpack/common";
 import { FluxEvents } from "@webpack/types";
 import { Promisable } from "type-fest";
 
 // exists to export default definePlugin({...})
 export default function definePlugin<P extends PluginDef>(p: P & Record<string, any>) {
     return p;
+}
+
+export function defineInterceptor(callback: UtilTypes.FluxCallbackPredicate, types: string) : FluxPluginInterceptor;
+export function defineInterceptor(callback: UtilTypes.FluxCallbackPredicate, types: FluxEvents[]) : FluxPluginInterceptor;
+export function defineInterceptor(callback: UtilTypes.FluxCallbackPredicate, types: string | FluxEvents[]) : FluxPluginInterceptor {
+  if (typeof types === 'string') types = types.split(/\s+/) as FluxEvents[];
+  types = types.filter(function(type){ return type; });
+  function wrappedEvent(data: any): boolean {
+    if (types.length && !(types.indexOf(data.type) + 1)) return false;
+    try {
+      return callback(data);
+    } catch (e) {
+      new Logger('Interceptor').error('Ignoring flux interception.', e);
+      return false;
+    }
+  }
+
+  return {
+    callback: callback,
+    wrapped: wrappedEvent,
+    types: types,
+  };
+}
+
+export function pluginInterceptors(...interceptors: FluxPluginInterceptor[]) : FluxPluginInterceptor[] {
+  return interceptors;
 }
 
 export type ReplaceFn = (match: string, ...groups: string[]) => string;
@@ -51,6 +79,12 @@ export interface Patch {
     group?: boolean;
     /** A function which returns whether this patch should be applied */
     predicate?(): boolean;
+}
+
+export interface FluxPluginInterceptor {
+    callback: UtilTypes.FluxCallbackPredicate;
+    wrapped: UtilTypes.FluxCallbackPredicate;
+    types: FluxEvents[];
 }
 
 export interface PluginAuthor {
@@ -124,6 +158,10 @@ export interface PluginDef {
     settingsAboutComponent?: React.ComponentType<{
         tempSettings?: Record<string, any>;
     }>;
+    /**
+     * Allows you to intercept Flux events
+     */
+    fluxInterceptors?: FluxPluginInterceptor[];
     /**
      * Allows you to subscribe to Flux events
      */
