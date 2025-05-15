@@ -16,22 +16,25 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-import { Guild, GuildMember, User } from "discord-types/general";
+import { Channel, Guild, GuildMember, Message, User } from "discord-types/general";
 import type { ReactNode } from "react";
 import { LiteralUnion } from "type-fest";
 
 import type { FluxEvents } from "./fluxEvents";
-import { i18nMessages } from "./i18nMessages";
 
 export { FluxEvents };
 
+export type FluxCallbackPredicate = (data: any) => boolean;
+export type FluxCallbackAction = (data: any) => void;
+
 export interface FluxDispatcher {
     _actionHandlers: any;
+    _interceptors: FluxCallbackPredicate[];
     _subscriptions: any;
     dispatch(event: { [key: string]: unknown; type: FluxEvents; }): Promise<void>;
     isDispatching(): boolean;
-    subscribe(event: FluxEvents, callback: (data: any) => void): void;
-    unsubscribe(event: FluxEvents, callback: (data: any) => void): void;
+    subscribe(event: FluxEvents, callback: FluxCallbackAction): void;
+    unsubscribe(event: FluxEvents, callback: FluxCallbackAction): void;
     wait(callback: () => void): void;
 }
 
@@ -134,6 +137,10 @@ export type Permissions = "CREATE_INSTANT_INVITE"
 
 export type PermissionsBits = Record<Permissions, bigint>;
 
+export interface MessageSnapshot {
+    message: Message;
+}
+
 export interface Locale {
     name: string;
     value: string;
@@ -148,19 +155,6 @@ export interface LocaleInfo {
     postgresLang: string;
 }
 
-export interface i18n {
-    getAvailableLocales(): Locale[];
-    getLanguages(): LocaleInfo[];
-    getDefaultLocale(): string;
-    getLocale(): string;
-    getLocaleInfo(): LocaleInfo;
-    setLocale(locale: string): void;
-
-    loadPromise: Promise<void>;
-
-    Messages: Record<i18nMessages, any>;
-}
-
 export interface Clipboard {
     copy(text: string): void;
     SUPPORTS_COPY: boolean;
@@ -171,6 +165,11 @@ export interface NavigationRouter {
     forward(): void;
     transitionTo(path: string, ...args: unknown[]): void;
     transitionToGuild(guildId: string, ...args: unknown[]): void;
+}
+
+export interface ChannelRouter {
+    transitionToChannel: (channelId: string) => void;
+    transitionToThread: (channel: Channel) => void;
 }
 
 export interface IconUtils {
@@ -332,4 +331,11 @@ export class DisplayProfile {
 export interface DisplayProfileUtils {
     getDisplayProfile(userId: string, guildId?: string, customStores?: any): DisplayProfile | null;
     useDisplayProfile(userId: string, guildId?: string, customStores?: any): DisplayProfile | null;
+}
+
+export interface DateUtils {
+    isSameDay(date1: Date, date2: Date): boolean;
+    calendarFormat(date: Date): string;
+    dateFormat(date: Date, format: string): string;
+    diffAsUnits(start: Date, end: Date, stopAtOneSecond?: boolean): Record<"days" | "hours" | "minutes" | "seconds", number>;
 }
