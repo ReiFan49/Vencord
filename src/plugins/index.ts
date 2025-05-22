@@ -20,6 +20,7 @@ import { addProfileBadge, removeProfileBadge } from "@api/Badges";
 import { addChatBarButton, removeChatBarButton } from "@api/ChatButtons";
 import { registerCommand, unregisterCommand } from "@api/Commands";
 import { addContextMenuPatch, removeContextMenuPatch } from "@api/ContextMenu";
+import { subscribePluginFluxInterceptors, unsubscribePluginFluxInterceptors } from "@api/fluxInterceptors";
 import { addMemberListDecorator, removeMemberListDecorator } from "@api/MemberListDecorators";
 import { addMessageAccessory, removeMessageAccessory } from "@api/MessageAccessories";
 import { addMessageDecoration, removeMessageDecoration } from "@api/MessageDecorations";
@@ -253,6 +254,7 @@ export function subscribeAllPluginsFluxEvents(fluxDispatcher: typeof FluxDispatc
     for (const name in Plugins) {
         if (!isPluginEnabled(name)) continue;
         subscribePluginFluxEvents(Plugins[name], fluxDispatcher);
+        subscribePluginFluxInterceptors(Plugins[name], fluxDispatcher);
     }
 }
 
@@ -294,6 +296,8 @@ export const startPlugin = traceFunction("startPlugin", function startPlugin(p: 
     if (enabledPluginsSubscribedFlux) {
         subscribePluginFluxEvents(p, FluxDispatcher);
     }
+
+    subscribePluginFluxInterceptors(p, FluxDispatcher);
 
     if (contextMenus) {
         logger.debug("Adding context menus patches of plugin", name);
@@ -355,6 +359,7 @@ export const stopPlugin = traceFunction("stopPlugin", function stopPlugin(p: Plu
     }
 
     unsubscribePluginFluxEvents(p, FluxDispatcher);
+    unsubscribePluginFluxInterceptors(p, FluxDispatcher);
 
     if (contextMenus) {
         logger.debug("Removing context menus patches of plugin", name);

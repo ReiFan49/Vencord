@@ -39,7 +39,6 @@ import { SpecialCard } from "./SpecialCard";
 
 const cl = classNameFactory("vc-settings-");
 
-const DEFAULT_DONATE_IMAGE = "https://cdn.discordapp.com/emojis/1026533090627174460.png";
 const SHIGGY_DONATE_IMAGE = "https://media.discordapp.net/stickers/1039992459209490513.png";
 
 const VENNIE_DONATOR_IMAGE = "https://cdn.discordapp.com/emojis/1238120638020063377.png";
@@ -58,7 +57,7 @@ function VencordSettings() {
     });
     const settings = useSettings();
 
-    const donateImage = React.useMemo(() => Math.random() > 0.5 ? DEFAULT_DONATE_IMAGE : SHIGGY_DONATE_IMAGE, []);
+    const donateImage = SHIGGY_DONATE_IMAGE;
 
     const isWindows = navigator.platform.toLowerCase().startsWith("win");
     const isMac = navigator.platform.toLowerCase().startsWith("mac");
