@@ -28,15 +28,15 @@ export default definePlugin({
     settings,
     patches: [
         {
-            find: ".removeMosaicItemHoverButton),",
+            find: '["VIDEO","CLIP","AUDIO"]',
             replacement: {
-                match: /\.nonMediaMosaicItem\]:!(\i).{0,50}?children:\[\S,(\S)/,
-                replace: "$&,$1&&$2&&$self.renderPiPButton(),"
-            },
-        },
+                match: /(\[\i>0&&\i\.length>0.{0,150}?children:)(\i.slice\(\i\))(?<=showDownload:(\i).+?isVisualMediaType:(\i).+?)/,
+                replace: (_, rest, origChildren, showDownload, isVisualMediaType) => `${rest}[${showDownload}&&${isVisualMediaType}&&$self.PictureInPictureButton(),...${origChildren}]`
+            }
+        }
     ],
 
-    renderPiPButton: ErrorBoundary.wrap(() => {
+    PictureInPictureButton: ErrorBoundary.wrap(() => {
         return (
             <Tooltip text="Toggle Picture in Picture">
                 {tooltipProps => (

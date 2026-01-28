@@ -41,25 +41,25 @@ export default definePlugin({
         {
             find: "DefaultCustomizationSections",
             replacement: {
-                match: /(?<=USER_SETTINGS_AVATAR_DECORATION},"decoration"\),)/,
+                match: /(?<=#{intl::USER_SETTINGS_AVATAR_DECORATION}\)},"decoration"\),)/,
                 replace: "$self.DecorSection(),"
             }
         },
         // Decoration modal module
         {
-            find: ".decorationGridItem,",
+            find: "80,onlyAnimateOnHoverOrFocus:!",
             replacement: [
                 {
-                    match: /(?<==)\i=>{let{children.{20,100}decorationGridItem/,
-                    replace: "$self.DecorationGridItem=$&"
+                    match: /(?<==)\i=>{let{children.{20,200}isSelected:\i=!1\}=\i/,
+                    replace: "$self.DecorationGridItem=$&",
                 },
                 {
-                    match: /(?<==)\i=>{let{user:\i,avatarDecoration.{300,600}decorationGridItemChurned/,
-                    replace: "$self.DecorationGridDecoration=$&"
+                    match: /(?<==)\i=>{let{user:\i,avatarDecoration/,
+                    replace: "$self.DecorationGridDecoration=$&",
                 },
                 // Remove NEW label from decor avatar decorations
                 {
-                    match: /(?<=\.\i\.PREMIUM_PURCHASE&&\i)(?<=avatarDecoration:(\i).+?)/,
+                    match: /(?<=\.\i\.PURCHASE)(?=,)(?<=avatarDecoration:(\i).+?)/,
                     replace: "||$1.skuId===$self.SKU_ID"
                 }
             ]
@@ -70,7 +70,7 @@ export default definePlugin({
             replacement: [
                 // Add Decor avatar decoration hook to avatar decoration hook
                 {
-                    match: /(?<=TryItOut:\i,guildId:\i}\),)(?<=user:(\i).+?)/,
+                    match: /(?<=\.avatarDecoration,guildId:\i\}\)\),)(?<=user:(\i).+?)/,
                     replace: "vcDecorAvatarDecoration=$self.useUserDecorAvatarDecoration($1),"
                 },
                 // Use added hook
@@ -87,15 +87,28 @@ export default definePlugin({
         },
         // Current user area, at bottom of channels/dm list
         {
-            find: "renderAvatarWithPopout(){",
+            find: "#{intl::ACCOUNT_SPEAKING_WHILE_MUTED}",
             replacement: [
                 // Use Decor avatar decoration hook
                 {
-                    match: /(?<=\i\)\({avatarDecoration:)(\i)(?=,)(?<=currentUser:(\i).+?)/,
+                    match: /(?<=\i\)\({avatarDecoration:)\i(?=,)(?<=currentUser:(\i).+?)/,
                     replace: "$self.useUserDecorAvatarDecoration($1)??$&"
                 }
             ]
-        }
+        },
+        ...[
+            '"Message Username"', // Messages
+            "#{intl::COLLECTIBLES_NAMEPLATE_PREVIEW_A11Y}", // Nameplate preview
+            "#{intl::ayozFl::raw}", // Avatar preview
+        ].map(find => ({
+            find,
+            replacement: [
+                {
+                    match: /(?<=userValue.{0,25}void 0:)((\i)\.avatarDecoration)/,
+                    replace: "$self.useUserDecorAvatarDecoration($2)??$1"
+                }
+            ]
+        })),
     ],
     settings,
 
@@ -138,5 +151,5 @@ export default definePlugin({
         }
     },
 
-    DecorSection: ErrorBoundary.wrap(DecorSection)
+    DecorSection: ErrorBoundary.wrap(DecorSection, { noop: true })
 });
