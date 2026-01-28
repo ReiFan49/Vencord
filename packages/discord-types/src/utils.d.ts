@@ -8,12 +8,13 @@ export { FluxEvents };
 
 export type FluxCallbackPredicate = (data: any) => boolean;
 export type FluxCallbackAction = (data: any) => void;
+type FluxEventsAutoComplete = LiteralUnion<FluxEvents, string>;
 
 export interface FluxDispatcher {
     _actionHandlers: any;
     _interceptors: FluxCallbackPredicate[];
     _subscriptions: any;
-    dispatch(event: { [key: string]: unknown; type: FluxEvents; }): Promise<void>;
+    dispatch(event: { [key: string]: unknown; type: FluxEventsAutoComplete; }): Promise<void>;
     isDispatching(): boolean;
     subscribe(event: FluxEvents, callback: FluxCallbackAction): void;
     unsubscribe(event: FluxEvents, callback: FluxCallbackAction): void;
@@ -226,34 +227,7 @@ export interface ExpressionPickerStore {
     useExpressionPickerStore<T>(selector: (state: ExpressionPickerStoreState) => T): T;
 }
 
-export interface BrowserWindowFeatures {
-    toolbar?: boolean;
-    menubar?: boolean;
-    location?: boolean;
-    directories?: boolean;
-    width?: number;
-    height?: number;
-    defaultWidth?: number;
-    defaultHeight?: number;
-    left?: number;
-    top?: number;
-    defaultAlwaysOnTop?: boolean;
-    movable?: boolean;
-    resizable?: boolean;
-    frame?: boolean;
-    alwaysOnTop?: boolean;
-    hasShadow?: boolean;
-    transparent?: boolean;
-    skipTaskbar?: boolean;
-    titleBarStyle?: string | null;
-    backgroundColor?: string;
-}
-
-export interface PopoutActions {
-    open(key: string, render: (windowKey: string) => ReactNode, features?: BrowserWindowFeatures);
-    close(key: string): void;
-    setAlwaysOnTop(key: string, alwaysOnTop: boolean): void;
-}
+export { BrowserWindowFeatures, PopoutActions } from "./stores/PopoutWindowStore";
 
 export type UserNameUtilsTagInclude = LiteralUnion<"auto" | "always" | "never", string>;
 export interface UserNameUtilsTagOptions {
@@ -276,6 +250,7 @@ export interface UsernameUtils {
     humanizeStatus: any;
 }
 
+// TODO: fix type
 export class DisplayProfile {
     userId: string;
     banner?: string;
