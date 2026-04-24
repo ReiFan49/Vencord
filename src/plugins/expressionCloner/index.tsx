@@ -74,9 +74,9 @@ function getGuildMaxStickerSlots(guild: Guild) {
 
 function getUrl(data: Data, size: number) {
     if (data.t === "Emoji")
-        return `${location.protocol}//${window.GLOBAL_ENV.CDN_HOST}/emojis/${data.id}.webp?size=${size}&lossless=true`;
+        return `${location.protocol}//${window.GLOBAL_ENV.CDN_HOST}/emojis/${data.id}.webp?size=${size}&lossless=true&animated=true`;
 
-    return `${window.GLOBAL_ENV.MEDIA_PROXY_ENDPOINT}/stickers/${data.id}.${StickerExtMap[data.format_type]}?size=${size}&lossless=true`;
+    return `${window.GLOBAL_ENV.MEDIA_PROXY_ENDPOINT}/stickers/${data.id}.${StickerExtMap[data.format_type]}?size=${size}&lossless=true&animated=true`;
 }
 
 async function fetchSticker(id: string) {
@@ -230,7 +230,7 @@ function CloneModal({ data }: { data: Sticker | Emoji; }) {
         <>
             <Forms.FormTitle className={Margins.top20}>Custom Name</Forms.FormTitle>
             <CheckedTextInput
-                value={name}
+                initialValue={name}
                 onChange={v => {
                     data.name = v;
                     setName(v);
@@ -409,7 +409,8 @@ migratePluginSettings("ExpressionCloner", "EmoteCloner");
 export default definePlugin({
     name: "ExpressionCloner",
     description: "Allows you to clone Emotes & Stickers to your own server (right click them)",
-    tags: ["StickerCloner", "EmoteCloner", "EmojiCloner"],
+    tags: ["Emotes", "Servers"],
+    searchTerms: ["StickerCloner", "EmoteCloner", "EmojiCloner"],
     authors: [Devs.Ven, Devs.Nuckyz],
     contextMenus: {
         "message": messageContextMenuPatch,

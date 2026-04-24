@@ -51,6 +51,7 @@ const settings = definePluginSettings({
 export default definePlugin({
     name: "CopyEmojiMarkdown",
     description: "Allows you to copy emojis as formatted string.",
+    tags: ["Emotes", "Utility"],
     authors: [Devs.HappyEnderman, Devs.Vishnya],
     settings,
 

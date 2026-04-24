@@ -37,19 +37,16 @@ export const settings = definePluginSettings({
 export default definePlugin({
     name: "SuperReactionTweaks",
     description: "Customize the limit of Super Reactions playing at once, and super react by default",
+    tags: ["Reactions", "Emotes"],
     authors: [Devs.FieryFlames, Devs.ant0n],
     patches: [
         {
             find: ",BURST_REACTION_EFFECT_PLAY",
             replacement: [
                 {
-                    /*
-                     * var limit = 5
-                     * ...
-                     * if (calculatePlayingCount(a,b) >= limit) return;
-                     */
-                    match: /((\i)=5.+?)if\((.{0,20}?)>=\2\)return;/,
-                    replace: (_, rest, playingCount) => `${rest}if(!$self.shouldPlayBurstReaction(${playingCount}))return;`
+                    // if (inlinedCalculatePlayingCount(a,b) >= limit) return;
+                    match: /(BURST_REACTION_EFFECT_PLAY:\i=>{.+?if\()(\(\(\i,\i\)=>.+?\(\i,\i\))>=5+?(?=\))/,
+                    replace: (_, rest, playingCount) => `${rest}!$self.shouldPlayBurstReaction(${playingCount})`
                 }
             ]
         },
