@@ -69,6 +69,32 @@ export function pluginInterceptors(...interceptors: FluxPluginInterceptor[]) : F
   return interceptors;
 }
 
+export const PluginTags = [
+    "Accessibility",
+    "Activity",
+    "Appearance",
+    "Chat",
+    "Commands",
+    "Console",
+    "Customisation",
+    "Developers",
+    "Emotes",
+    "Friends",
+    "Fun",
+    "Media",
+    "Notifications",
+    "Organisation",
+    "Privacy",
+    "Reactions",
+    "Roles",
+    "Servers",
+    "Shortcuts",
+    "Utility",
+    "Voice"
+] as const;
+
+export type PluginTag = typeof PluginTags[number];
+
 export type ReplaceFn = (match: string, ...groups: string[]) => string;
 
 export interface PatchReplacement {
@@ -134,6 +160,9 @@ export type IconProps = { height?: number | string; width?: number | string; cla
 export interface PluginDef {
     name: string;
     description: string;
+    /** Additional search terms that will bring up your plugin */
+    searchTerms?: string[];
+    tags?: PluginTag[];
     authors: PluginAuthor[];
     start?(): void;
     stop?(): void;
@@ -215,8 +244,6 @@ export interface PluginDef {
      */
     toolboxActions?: Record<string, () => void> | (() => ReactNode);
 
-    tags?: string[];
-
     /**
      * Managed style to automatically enable and disable when the plugin is enabled or disabled
      */
@@ -235,16 +262,6 @@ export interface PluginDef {
     renderMessageDecoration?: MessageDecorationFactory;
 
     renderMemberListDecorator?: MemberListDecoratorFactory;
-
-    // TODO: Remove eventually
-    /**
-     * @deprecated Use {@link chatBarButton} instead
-     */
-    renderChatBarButton?: never;
-    /**
-     * @deprecated Use {@link messagePopoverButton} instead
-     */
-    renderMessagePopoverButton?: never;
 }
 
 export const enum StartAt {
@@ -331,6 +348,8 @@ interface IsValid<T, D = unknown> {
 export interface PluginSettingStringDef {
     type: OptionType.STRING;
     default?: string;
+    /** Whether to use a multiline text area */
+    multiline?: boolean;
 }
 export interface PluginSettingNumberDef {
     type: OptionType.NUMBER;
