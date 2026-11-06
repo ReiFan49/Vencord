@@ -7,17 +7,19 @@ import { ApplicationCommandOptionType, ChannelType, PremiumType } from "../enums
 
 export { FluxEvents };
 
+export type FluxCallbackPredicate = (data: any) => boolean;
+export type FluxCallbackAction = (data: any) => void;
 type FluxEventsAutoComplete = LiteralUnion<FluxEvents, string>;
 
 export interface FluxDispatcher {
     _actionHandlers: any;
-    _interceptors: any;
+    _interceptors: FluxCallbackPredicate[];
     _subscriptions: any;
     addInterceptor(interceptor: any): void;
     dispatch(event: { [key: string]: unknown; type: FluxEventsAutoComplete; }): Promise<void>;
     isDispatching(): boolean;
-    subscribe(event: FluxEventsAutoComplete, callback: (data: any) => void): void;
-    unsubscribe(event: FluxEventsAutoComplete, callback: (data: any) => void): void;
+    subscribe(event: FluxEvents, callback: FluxCallbackAction): void;
+    unsubscribe(event: FluxEvents, callback: FluxCallbackAction): void;
     wait(callback: () => void): void;
 }
 

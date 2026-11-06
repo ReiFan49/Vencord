@@ -24,6 +24,8 @@ import { MessageAccessoryFactory } from "@api/MessageAccessories";
 import { MessageDecorationFactory } from "@api/MessageDecorations";
 import { MessageClickListener, MessageEditListener, MessageSendListener } from "@api/MessageEvents";
 import { MessagePopoverButtonData } from "@api/MessagePopover";
+import { Logger } from "@utils/Logger";
+import { UtilTypes } from "@webpack/common";
 import { Command, FluxEvents } from "@vencord/discord-types";
 import { ReactNode } from "react";
 import { LiteralUnion } from "type-fest";
@@ -39,6 +41,32 @@ export function makeRange(start: number, end: number, step = 1) {
         ranges.push(Math.round(value * 100) / 100);
     }
     return ranges;
+}
+
+export function defineInterceptor(callback: UtilTypes.FluxCallbackPredicate, types: string) : FluxPluginInterceptor;
+export function defineInterceptor(callback: UtilTypes.FluxCallbackPredicate, types: FluxEvents[]) : FluxPluginInterceptor;
+export function defineInterceptor(callback: UtilTypes.FluxCallbackPredicate, types: string | FluxEvents[]) : FluxPluginInterceptor {
+  if (typeof types === 'string') types = types.split(/\s+/) as FluxEvents[];
+  types = types.filter(function(type){ return type; });
+  function wrappedEvent(data: any): boolean {
+    if (types.length && !(types.indexOf(data.type) + 1)) return false;
+    try {
+      return callback(data);
+    } catch (e) {
+      new Logger('Interceptor').error('Ignoring flux interception.', e);
+      return false;
+    }
+  }
+
+  return {
+    callback: callback,
+    wrapped: wrappedEvent,
+    types: types,
+  };
+}
+
+export function pluginInterceptors(...interceptors: FluxPluginInterceptor[]) : FluxPluginInterceptor[] {
+  return interceptors;
 }
 
 export const PluginTags = [
@@ -110,6 +138,12 @@ export interface Patch {
     toBuild?: number;
 }
 
+export interface FluxPluginInterceptor {
+    callback: UtilTypes.FluxCallbackPredicate;
+    wrapped: UtilTypes.FluxCallbackPredicate;
+    types: FluxEvents[];
+}
+
 export interface PluginAuthor {
     name: string;
     id: BigInt;
@@ -177,6 +211,10 @@ export interface PluginDef {
      * plugin's settings page
      */
     settingsAboutComponent?: React.ComponentType<{}>;
+    /**
+     * Allows you to intercept Flux events
+     */
+    fluxInterceptors?: FluxPluginInterceptor[];
     /**
      * Allows you to subscribe to Flux events
      */
